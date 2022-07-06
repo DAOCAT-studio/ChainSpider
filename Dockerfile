@@ -9,4 +9,4 @@ WORKDIR /app
 #修改为清华源
 RUN pip install -r requirements.txt
 # Run glassnode.py when the container launches
-CMD ["python", "/app/glassnode.py"]
+CMD ["python", "/app/fetcher/glassnode.py"]
