@@ -96,13 +96,12 @@ class Spider(object):
         logger.info("done!bye!")
 
     def handle_api(self, api_url_list):
-        print('获取数据中...')
         threads = []
         # 线程数
         n = len(API_KEY_LIST)
         # 需处理的url数量
         total = len(api_url_list)
-        if total > n:
+        if total >= n:
             if total % n == 0:
                 cnt = total // n
             else:
@@ -131,6 +130,7 @@ class Spider(object):
         time.sleep(1)
 
         # 数据获取主函数
+        print('获取数据中...')
         self.handle_api(self.api_url)
         # 补充请求返回429状态的api
         self.check_429()
