@@ -14,4 +14,5 @@ USER = 'root'
 PASSWD = 'Hwt123456!'
 DB = "api_data"
 
-LOG_ROOT = "F:/"
+# LOG_ROOT = "F:/"
+LOG_ROOT = "./"
