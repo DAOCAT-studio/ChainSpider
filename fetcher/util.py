@@ -7,7 +7,7 @@ from logging import handlers
 
 import pymysql
 import requests
-from fetcher import settings
+import settings
 
 LOG_ROOT = settings.LOG_ROOT
 
