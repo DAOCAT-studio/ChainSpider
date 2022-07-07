@@ -7,7 +7,8 @@ PARAMS = {
     'api_key': random.choice(API_KEY_LIST)
 }
 
-HOST = '127.0.0.1'
+# HOST = '127.0.0.1'
+HOST = '0.0.0.0'
 PORT = 3306
 USER = 'root'
 # PASSWD = 'hwt123'

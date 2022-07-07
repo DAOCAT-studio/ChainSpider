@@ -6,7 +6,7 @@ import traceback
 
 import aiohttp
 import requests
-from fake_useragent import UserAgent
+
 from lxml import etree
 
 import settings
@@ -50,8 +50,7 @@ class Spider(object):
 
     async def get_api_url(self, group_url, session):
         try:
-            headers = {"User-Agent": str(UserAgent().random)}
-            async with session.get(url=group_url, headers=headers) as res:
+            async with session.get(url=group_url) as res:
                 r = await res.text()
                 tree = etree.HTML(r)
                 result = tree.xpath(
@@ -68,10 +67,9 @@ class Spider(object):
     def get_data(self, api_url_li, api_key):
         try:
             for api_url in api_url_li:
-                headers = {"User-Agent": str(UserAgent().random)}
                 params['api_key'] = api_key
                 print("getting api: ", api_url)
-                r = requests.get(url=api_url, params=params, headers=headers)
+                r = requests.get(url=api_url, params=params)
                 # 将其他url存入追踪表
                 db_trace(api_url, symbol, r.status_code)
 
