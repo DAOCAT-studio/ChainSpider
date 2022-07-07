@@ -7,12 +7,17 @@ PARAMS = {
     'api_key': random.choice(API_KEY_LIST)
 }
 
-HOST = '127.0.0.1'
-# HOST = '0.0.0.0'
-PORT = 3307
-USER = 'root'
+# local
+# HOST = '127.0.0.1'
 # PASSWD = 'hwt123'
+# PORT = 3306
+
+# server
+HOST = '172.17.0.1'
+PORT = 3307
 PASSWD = '123456'
+
+USER = 'root'
 DB = "api_data"
 
 # LOG_ROOT = "F:/"

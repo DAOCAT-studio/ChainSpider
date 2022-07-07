@@ -6,11 +6,10 @@ import traceback
 
 import aiohttp
 import requests
-
 from lxml import etree
 
 import settings
-from util import get_logger, db_handle, db_ori_set, db_trace
+from util import get_logger, db_handle, db_ori_set, db_trace, db_get_429
 
 API_KEY_LIST = settings.API_KEY_LIST
 symbol = settings.SYMBOL
@@ -85,6 +84,40 @@ class Spider(object):
             print(traceback.format_exc())
             logger.error(e)
 
+    # 重新获取返回429的api
+    def check_429(self):
+        res = db_get_429()
+        while res:
+            logger.info("there are {} api response 429 left, requesting...".format(len(res)))
+            api_url_list = [i[0] for i in res]
+            # print(api_url_list)
+            self.handle_api(api_url_list, join_status=True)
+            res = db_get_429()
+        logger.info("done!bye!")
+
+    def handle_api(self, api_url_list, join_status):
+        print('获取数据中...')
+        threads = []
+        # 线程数
+        n = len(API_KEY_LIST)
+        # 需处理的url数量
+        total = len(api_url_list)
+        if total > n:
+            if total % n == 0:
+                cnt = total // n
+            else:
+                cnt = total // n + 1
+        else:
+            cnt = 1
+        # 遍历key列表，将均分的任务列表交给每个线程
+        for i, key in enumerate(API_KEY_LIST):
+            threads.append(threading.Thread(target=self.get_data, args=(api_url_list[i * cnt:(i + 1) * cnt], key)))
+
+        for i in threads:
+            i.start()
+            if join_status:
+                i.join()
+
     def run(self):
         print('初始化追踪表状态...')
         db_ori_set()
@@ -97,23 +130,11 @@ class Spider(object):
         logger.info(
             "共获取{}个api".format(len(self.api_url)))
         time.sleep(1)
-        print('获取数据中...')
 
-        threads = []
-        # 线程数
-        n = len(API_KEY_LIST)
-        # 需处理的url数量
-        total = len(self.api_url)
-        if total % n == 0:
-            cnt = total // n
-        else:
-            cnt = total // n + 1
-        # 遍历key列表，将均分的任务列表交给每个线程
-        for i, key in enumerate(API_KEY_LIST):
-            threads.append(threading.Thread(target=self.get_data, args=(self.api_url[i * cnt:(i + 1) * cnt], key)))
-
-        for i in threads:
-            i.start()
+        # 数据获取主函数
+        self.handle_api(self.api_url, join_status=False)
+        # 补充请求返回429状态的api
+        self.check_429()
 
 
 if __name__ == '__main__':
