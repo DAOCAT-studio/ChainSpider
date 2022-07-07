@@ -71,7 +71,7 @@ class Spider(object):
                 print("getting api: ", api_url)
                 r = requests.get(url=api_url, params=params)
                 # 将其他url存入追踪表
-                db_trace(api_url, symbol, r.status_code)
+                db_trace(api_url, symbol, api_key, r.status_code)
 
                 if r.status_code == 200:
                     result_list = json.loads(r.text)

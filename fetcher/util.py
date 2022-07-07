@@ -7,6 +7,7 @@ from logging import handlers
 
 import pymysql
 import requests
+
 import settings
 
 LOG_ROOT = settings.LOG_ROOT
@@ -175,7 +176,7 @@ def db_handle(api_url, symbol, result_list):
         logger.error(e)
 
 
-def db_trace(api_url, symbol, status):
+def db_trace(api_url, symbol, api_key, status):
     logger = get_logger("glassnode.log")
     try:
         host = settings.HOST
@@ -193,17 +194,19 @@ def db_trace(api_url, symbol, status):
             with conn.cursor() as cursor:
                 # 执行插入，如主键存在即更新
                 api_symbol = '{}_{}'.format(api_url, symbol)
-                update_data = (api_symbol, api_url, symbol, 1, status,
+                update_data = (api_symbol, api_url, symbol, 1, api_key, status,
                                time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
                 # update_query = 'INSERT INTO `state_trace` ( `api_symbol`,`api`, `symbol`, `{col_name}` ) VALUES ( %s, %s, %s ) ' \
                 #                'ON DUPLICATE KEY UPDATE `symbol` = %s, `{col_name}`= %s '.format(col_name=col_name)
-                update_query = "REPLACE INTO `state_trace` ( `api_symbol`,`api`, `symbol`, `state`, `last_status`, `updatetime` ) VALUES ( %s, %s, %s, %s, %s, %s) "
+                update_query = "REPLACE INTO `state_trace` ( `api_symbol`,`api`, `symbol`, `state`,`api_key`, `last_status`, `updatetime` ) " \
+                               "VALUES ( %s, %s, %s, %s, %s, %s, %s) "
                 # print(update_query)
                 cursor.execute(update_query, update_data)
                 print('successfully updated state_trace!')
 
     except Exception as e:
         logger.error(e)
+
 
 if __name__ == '__main__':
     api = "https://api.glassnode.com/v1/metrics/addresses/sending_count"
