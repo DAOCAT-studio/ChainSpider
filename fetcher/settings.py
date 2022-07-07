@@ -9,10 +9,10 @@ PARAMS = {
 
 HOST = '127.0.0.1'
 # HOST = '0.0.0.0'
-PORT = 3306
+PORT = 3307
 USER = 'root'
 # PASSWD = 'hwt123'
-PASSWD = 'Hwt123456!'
+PASSWD = '123456'
 DB = "api_data"
 
 # LOG_ROOT = "F:/"
