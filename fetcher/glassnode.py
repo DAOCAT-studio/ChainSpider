@@ -91,11 +91,11 @@ class Spider(object):
             logger.info("there are {} api response 429 left, requesting...".format(len(res)))
             api_url_list = [i[0] for i in res]
             # print(api_url_list)
-            self.handle_api(api_url_list, join_status=True)
+            self.handle_api(api_url_list)
             res = db_get_429()
         logger.info("done!bye!")
 
-    def handle_api(self, api_url_list, join_status):
+    def handle_api(self, api_url_list):
         print('获取数据中...')
         threads = []
         # 线程数
@@ -115,8 +115,7 @@ class Spider(object):
 
         for i in threads:
             i.start()
-            if join_status:
-                i.join()
+            i.join()
 
     def run(self):
         print('初始化追踪表状态...')
@@ -132,7 +131,7 @@ class Spider(object):
         time.sleep(1)
 
         # 数据获取主函数
-        self.handle_api(self.api_url, join_status=False)
+        self.handle_api(self.api_url)
         # 补充请求返回429状态的api
         self.check_429()
 
