@@ -23,14 +23,18 @@ class Spider(object):
 
     def get_group_url(self):
         try:
-            url = 'https://docs.glassnode.com/api/addresses'
+            # url = 'https://docs.glassnode.com/api/addresses'
+            url = 'https://docs.glassnode.com/basic-api/endpoints'
             r = requests.get(url=url)
             tree = etree.HTML(r.text)
-            result = tree.xpath('/html/body/div[1]/div/div/div[2]/div[1]/div/div[1]/div/div/div[5]/div[2]/div/a/@href')
+            # result = tree.xpath('/html/body/div[1]/div/div/div[2]/div[1]/div/div[1]/div/div/div[5]/div[2]/div/a/@href')
+            # result = tree.xpath('/html/body/div[1]/div/div/div[2]/div[1]/div/div[1]/div/div/div[4]/div[2]/div[5]/div/div/a/@href')
+            result = tree.xpath('/html/body/div[1]/div/div/div[2]/div[2]/div/div/div/div/div/div[2]/div[1]/div/div/div/div[2]/a/@href')
             # print(result)
             for i in result:
                 # print(i)
                 self.group_url.append('https://docs.glassnode.com{}'.format(i))
+            print("共获取{}个页面".format(len(self.group_url)))
         except:
             print(traceback.format_exc())
 

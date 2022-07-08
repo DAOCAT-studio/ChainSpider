@@ -110,18 +110,22 @@ def db_handle(api_url, symbol, result_list):
 
             # 整理成要插入数据库的数据
             for item in result_list:
-                data = []
+
+                temp = []
+                t = item.get("t")
                 for value in item.values():
-                    data.append(json.dumps(value) if isinstance(value, dict) else value)
-                data.append(symbol)
-                insert_data.append(tuple(data))
+                    temp.append(json.dumps(value) if isinstance(value, dict) else value)
+                # data.append(symbol)
+                data = temp[1]
+
+                insert_data.append(("{}_{}".format(t, symbol), t, data, symbol, data))
         # 解决某些api返回是字典的情况
         elif isinstance(result_list, dict):
             t = result_list.pop("t")
             data = json.dumps(result_list)
             col_name = col_name + '_data'
             col_type = 'json'
-            insert_data.append((t, data, symbol))
+            insert_data.append(("{}_{}".format(t, symbol), t, data, symbol, data))
         else:
             print(result_list)
             logger.info("unknown response type", api_url)
@@ -158,22 +162,61 @@ def db_handle(api_url, symbol, result_list):
             # 插入api返回的数据
             with conn.cursor() as cursor:
                 try:
-                    # 执行插入
-                    insert_query = "INSERT INTO glassnode ( t, " + col_name + ", symbol ) VALUES ( %s, %s, %s ) "
-                    # print(insert_query)
+                    # 1
+                    # 先检查相同的t和symbol是否存在，存在即更新，不存在即插入
+                    # select_query = "SELECT 1 FROM glassnode WHERE t=%s AND symbol=%s "
+                    # insert_query = "INSERT INTO glassnode ( t, " + col_name + ", symbol ) VALUES ( %s, %s, %s ) "
+                    # insert_query = "INSERT INTO glassnode ( t, " + col_name + ", symbol ) SELECT %s,%s,%s " \
+                    #                "WHERE NOT EXISTS (SELECT 1 FROM glassnode WHERE t=%s AND symbol=%s)"
+                    # # print(insert_query)
+                    # # print(insert_data)
+                    # # print(len(insert_data))
+                    # cursor.executemany(insert_query, insert_data)
+
+                    # 2
+                    # for tup in insert_data:
+                    #     # print(tup)
+                    #     t = tup[0]
+                    #     data = tup[1]
+                    #     symbol = tup[2]
+                    #
+                    #     check_sql = "SELECT 1 FROM glassnode WHERE t=%s AND symbol=%s "
+                    #     cursor.execute(check_sql, (t, symbol))
+                    #     if cursor.fetchall():
+                    #         update_sql = "UPDATE `glassnode` SET `" + col_name + "` = %s "
+                    #         # print(update_sql)
+                    #         cursor.execute(update_sql, (data))
+                    #     else:
+                    #         # insert_sql = "INSERT INTO glassnode ( t, " + col_name + ", symbol ) SELECT %s,%s,%s " \
+                    #         #                                                         "WHERE NOT EXISTS (SELECT 1 FROM glassnode WHERE t=%s AND symbol=%s)"
+                    #         insert_sql = "INSERT INTO glassnode ( t, " + col_name + ", symbol ) VALUES ( %s, %s, %s ) "
+                    #         cursor.execute(insert_sql, tup)
+
+                    # 3
+                    # sql = "INSERT INTO `glassnode` ( `t_symbol`, `t`, `" + col_name + "`, `symbol` ) VALUES ( %s, %s, %s, %s ) ON DUPLICATE KEY UPDATE `" + col_name + "`=%s "
+                    # print(sql)
                     # print(insert_data)
-                    # print(len(insert_data))
-                    cursor.executemany(insert_query, insert_data)
+                    # cursor.executemany(sql, insert_data)
+
+                    # 4
+                    for data in insert_data:
+                        sql = "INSERT INTO glassnode ( t_symbol, t, " + col_name + ", symbol ) VALUES ( %s, %s, %s, %s ) ON DUPLICATE KEY UPDATE " + col_name + " = %s "
+                        # print(sql)
+                        cursor.execute(sql,(data[0],data[1],data[2],data[3],data[4]))
+
                     print('successfully inserted data!')
-                except Exception as e:
-                    logger.error("{}:col_name-{},col_type-{},sql-{}".format(e, col_name, col_type, insert_query))
+                except:
+                    # logger.error("{}:col_name-{},col_type-{},sql-{}".format(e, col_name, col_type, insert_query))
+                    # logger.info(e)
+                    print(traceback.format_exc())
+
 
 
     except Exception as e:
         # print(result_list)
         # print(insert_data)
-        # print(traceback.format_exc())
-        logger.error(e)
+        print(traceback.format_exc())
+        # logger.error(e)
 
 
 def db_trace(api_url, symbol, api_key, status):
