@@ -2,12 +2,12 @@ import random
 import sys
 
 API_KEY_LIST = ['2BPofIMYS789jEMXbi8dcEiF4Xj', '2BF0rMZPoEZzyDP0v913XREBCsO', '2BY58n2bpVtRxoAGgph2UThtyQa']
-SYMBOL = 'BTC'
-PARAMS = {
-    'a': SYMBOL,
-    'i': '24h',
-    'api_key': random.choice(API_KEY_LIST)
-}
+# SYMBOL = 'BTC'
+# PARAMS = {
+#     'a': SYMBOL,
+#     'i': '24h',
+#     'api_key': random.choice(API_KEY_LIST)
+# }
 
 if sys.platform == 'win32':
     # local

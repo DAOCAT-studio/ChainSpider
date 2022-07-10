@@ -1,5 +1,6 @@
 import asyncio
 import json
+import random
 import threading
 import time
 import traceback
@@ -12,14 +13,21 @@ import settings
 from util import get_logger, db_handle, db_ori_set, db_trace, db_get_429
 
 API_KEY_LIST = settings.API_KEY_LIST
-symbol = settings.SYMBOL
-params = settings.PARAMS
+# symbol = settings.SYMBOL
+# params = settings.PARAMS
 
 
 class Spider(object):
-    def __init__(self):
+    def __init__(self, symbol):
         self.group_url = []
         self.api_url = []
+
+        self.symbol = symbol
+        self.params = {
+            'a': self.symbol,
+            'i': '24h',
+            'api_key': random.choice(API_KEY_LIST)
+        }
 
     def get_group_url(self):
         try:
@@ -29,7 +37,8 @@ class Spider(object):
             tree = etree.HTML(r.text)
             # result = tree.xpath('/html/body/div[1]/div/div/div[2]/div[1]/div/div[1]/div/div/div[5]/div[2]/div/a/@href')
             # result = tree.xpath('/html/body/div[1]/div/div/div[2]/div[1]/div/div[1]/div/div/div[4]/div[2]/div[5]/div/div/a/@href')
-            result = tree.xpath('/html/body/div[1]/div/div/div[2]/div[2]/div/div/div/div/div/div[2]/div[1]/div/div/div/div[2]/a/@href')
+            result = tree.xpath(
+                '/html/body/div[1]/div/div/div[2]/div[2]/div/div/div/div/div/div[2]/div[1]/div/div/div/div[2]/a/@href')
             # print(result)
             for i in result:
                 # print(i)
@@ -70,18 +79,18 @@ class Spider(object):
     def get_data(self, api_url_li, api_key):
         try:
             for api_url in api_url_li:
-                params['api_key'] = api_key
+                self.params['api_key'] = api_key
                 print("getting api: ", api_url)
-                r = requests.get(url=api_url, params=params)
+                r = requests.get(url=api_url, params=self.params)
                 # 将其他url存入追踪表
-                db_trace(api_url, symbol, api_key, r.status_code)
+                db_trace(api_url, self.symbol, api_key, r.status_code)
 
                 if r.status_code == 200:
                     result_list = json.loads(r.text)
                     # print(result_list)
 
                     if result_list:
-                        db_handle(api_url, symbol, result_list)
+                        db_handle(api_url, self.symbol, result_list)
 
                 time.sleep(1)
         except Exception as e:
@@ -142,4 +151,6 @@ class Spider(object):
 
 if __name__ == '__main__':
     logger = get_logger("glassnode.log")
-    Spider().run()
+    symbol_list = settings.SYMBOL_LIST
+    for symbol in symbol_list:
+        Spider(symbol).run()
