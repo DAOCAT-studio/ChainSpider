@@ -89,7 +89,7 @@ def db_ori_set():
 
 
 def db_handle(api_url, symbol, result_list):
-    logger = get_logger("glassnode.log")
+    # logger = get_logger("glassnode.log")
     try:
         host = settings.HOST
         port = settings.PORT
@@ -128,7 +128,7 @@ def db_handle(api_url, symbol, result_list):
             insert_data.append(("{}_{}".format(t, symbol), t, data, symbol, data))
         else:
             print(result_list)
-            logger.info("unknown response type", api_url)
+            # logger.info("unknown response type", api_url)
             raise TypeError("unknown response type")
 
         # print(insert_data)
@@ -158,7 +158,7 @@ def db_handle(api_url, symbol, result_list):
                             print('successfully created a new column named `{}`!'.format(col_name))
                         except pymysql.err.OperationalError as err:
                             print(err)
-                            logger.error("{}:col_name-{},col_type-{},sql-{}".format(err, col_name, col_type, sql))
+                            # logger.error("{}:col_name-{},col_type-{},sql-{}".format(err, col_name, col_type, sql))
             # 插入api返回的数据
             with conn.cursor() as cursor:
                 try:
@@ -220,7 +220,7 @@ def db_handle(api_url, symbol, result_list):
 
 
 def db_trace(api_url, symbol, api_key, status):
-    logger = get_logger("glassnode.log")
+    # logger = get_logger("glassnode.log")
     try:
         host = settings.HOST
         port = settings.PORT
@@ -248,11 +248,12 @@ def db_trace(api_url, symbol, api_key, status):
                 print('successfully updated state_trace!')
 
     except Exception as e:
-        logger.error(e)
+        # logger.error(e)
+        print(e)
 
 
 def db_get_429(symbol):
-    logger = get_logger("glassnode.log")
+    # logger = get_logger("glassnode.log")
     try:
         host = settings.HOST
         port = settings.PORT
@@ -273,7 +274,7 @@ def db_get_429(symbol):
                 return re_cur
 
     except Exception as e:
-        logger.error(e)
+        print(e)
 
 
 if __name__ == '__main__':

@@ -96,14 +96,16 @@ class Spider(object):
 
                 time.sleep(1)
         except Exception as e:
-            print(traceback.format_exc())
-            logger.error(e)
+            # print(traceback.format_exc())
+            # logger.error(e)
+            print(e)
 
     # 重新获取返回429的api
     def check_429(self, symbol):
         res = db_get_429(symbol)
         while res:
-            logger.info("there are {} api response 429 with symbol {} left, requesting...".format(len(res), symbol))
+            # logger.info("there are {} api response 429 with symbol {} left, requesting...".format(len(res), symbol))
+            print("there are {} api response 429 with symbol {} left, requesting...".format(len(res), symbol))
             api_url_list = [i[0] for i in res]
             # print(api_url_list)
             self.handle_api(api_url_list, symbol)
