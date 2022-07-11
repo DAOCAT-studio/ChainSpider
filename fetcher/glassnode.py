@@ -13,18 +13,19 @@ import settings
 from util import get_logger, db_handle, db_ori_set, db_trace, db_get_429
 
 API_KEY_LIST = settings.API_KEY_LIST
+
+
 # symbol = settings.SYMBOL
 # params = settings.PARAMS
 
 
 class Spider(object):
-    def __init__(self, symbol):
+    def __init__(self):
         self.group_url = []
         self.api_url = []
 
-        self.symbol = symbol
         self.params = {
-            'a': self.symbol,
+            # 'a': self.symbol,
             'i': '24h',
             'api_key': random.choice(API_KEY_LIST)
         }
@@ -76,21 +77,21 @@ class Spider(object):
             print(traceback.format_exc())
 
     # 不同的key开不同的线程
-    def get_data(self, api_url_li, api_key):
+    def get_data(self, api_url_li, api_key, symbol):
         try:
             for api_url in api_url_li:
                 self.params['api_key'] = api_key
                 print("getting api: ", api_url)
                 r = requests.get(url=api_url, params=self.params)
                 # 将其他url存入追踪表
-                db_trace(api_url, self.symbol, api_key, r.status_code)
+                db_trace(api_url, symbol, api_key, r.status_code)
 
                 if r.status_code == 200:
                     result_list = json.loads(r.text)
                     # print(result_list)
 
                     if result_list:
-                        db_handle(api_url, self.symbol, result_list)
+                        db_handle(api_url, symbol, result_list)
 
                 time.sleep(1)
         except Exception as e:
@@ -98,17 +99,17 @@ class Spider(object):
             logger.error(e)
 
     # 重新获取返回429的api
-    def check_429(self):
-        res = db_get_429()
+    def check_429(self, symbol):
+        res = db_get_429(symbol)
         while res:
-            logger.info("there are {} api response 429 left, requesting...".format(len(res)))
+            logger.info("there are {} api response 429 with symbol {} left, requesting...".format(len(res), symbol))
             api_url_list = [i[0] for i in res]
             # print(api_url_list)
-            self.handle_api(api_url_list)
-            res = db_get_429()
+            self.handle_api(api_url_list, symbol)
+            res = db_get_429(symbol)
         logger.info("done!bye!")
 
-    def handle_api(self, api_url_list):
+    def handle_api(self, api_url_list, symbol):
         threads = []
         # 线程数
         n = len(API_KEY_LIST)
@@ -123,13 +124,14 @@ class Spider(object):
             cnt = 1
         # 遍历key列表，将均分的任务列表交给每个线程
         for i, key in enumerate(API_KEY_LIST):
-            threads.append(threading.Thread(target=self.get_data, args=(api_url_list[i * cnt:(i + 1) * cnt], key)))
+            threads.append(
+                threading.Thread(target=self.get_data, args=(api_url_list[i * cnt:(i + 1) * cnt], key, symbol)))
 
         for i in threads:
             i.start()
             i.join()
 
-    def run(self):
+    def run_main(self):
         print('初始化追踪表状态...')
         db_ori_set()
         print('获取页面url中...')
@@ -141,16 +143,15 @@ class Spider(object):
         logger.info(
             "共获取{}个api".format(len(self.api_url)))
         time.sleep(1)
-
         # 数据获取主函数
         print('获取数据中...')
-        self.handle_api(self.api_url)
-        # 补充请求返回429状态的api
-        self.check_429()
+        for symbol in settings.SYMBOL_LIST:
+            # Spider(symbol).run_main()
+            self.handle_api(self.api_url, symbol)
+            # 补充请求返回429状态的api
+            self.check_429(symbol)
 
 
 if __name__ == '__main__':
     logger = get_logger("glassnode.log")
-    symbol_list = settings.SYMBOL_LIST
-    for symbol in symbol_list:
-        Spider(symbol).run()
+    Spider().run_main()
