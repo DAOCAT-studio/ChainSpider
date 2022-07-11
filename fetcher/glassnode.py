@@ -81,7 +81,8 @@ class Spider(object):
         try:
             for api_url in api_url_li:
                 self.params['api_key'] = api_key
-                print("getting api: ", api_url)
+                self.params['a'] = symbol
+                print("getting {} with symbol {}...".format(api_url,symbol))
                 r = requests.get(url=api_url, params=self.params)
                 # 将其他url存入追踪表
                 db_trace(api_url, symbol, api_key, r.status_code)
@@ -129,7 +130,8 @@ class Spider(object):
 
         for i in threads:
             i.start()
-            i.join()
+        for j in threads:
+            j.join()
 
     def run_main(self):
         print('初始化追踪表状态...')
