@@ -108,7 +108,7 @@ class Spider(object):
             # print(api_url_list)
             self.handle_api(api_url_list, symbol)
             res = db_get_429(symbol)
-        logger.info("done!bye!")
+        # logger.info("done!bye!")
 
     def handle_api(self, api_url_list, symbol):
         threads = []

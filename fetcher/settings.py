@@ -1,6 +1,7 @@
 import sys
 
-API_KEY_LIST = ['2BPofIMYS789jEMXbi8dcEiF4Xj', '2BF0rMZPoEZzyDP0v913XREBCsO', '2BY58n2bpVtRxoAGgph2UThtyQa']
+API_KEY_LIST = ['2BPofIMYS789jEMXbi8dcEiF4Xj', '2BF0rMZPoEZzyDP0v913XREBCsO', '2BY58n2bpVtRxoAGgph2UThtyQa',
+                '2BmTVlIqRKYCPrKVdznuO5oFdHq', '2BmTvkJL6zDjTQZpS4xonOKqmVE', '2BmUM2A7xjKlLCqhh8f8HUgDLwC']
 # SYMBOL = 'BTC'
 # PARAMS = {
 #     'a': SYMBOL,
@@ -11,15 +12,16 @@ API_KEY_LIST = ['2BPofIMYS789jEMXbi8dcEiF4Xj', '2BF0rMZPoEZzyDP0v913XREBCsO', '2
 if sys.platform == 'win32':
     # local
     HOST = '127.0.0.1'
+    USER = 'root'
     PASSWD = 'hwt123'
     PORT = 3306
 else:
     # server
-    HOST = '172.17.0.1'
-    PORT = 3307
-    PASSWD = '123456'
+    HOST = '43.158.211.160'
+    PORT = 3306
+    USER = 'admin'
+    PASSWD = 'admin'
 
-USER = 'root'
 DB = "api_data"
 
 # LOG_ROOT = "F:/"
