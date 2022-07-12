@@ -12,11 +12,13 @@ def se_data(t, symbol):
 
         conn = pymysql.connect(host=host, user=user, password=passwd, database=db, port=port,
                                autocommit=True)
-        print(conn)
+        t_symbol = "{}_{}".format(t,symbol)
         with conn:
             with conn.cursor() as cursor:
-                sql = "SELECT * FROM glassnode WHERE t=%s AND symbol=%s "
-                cursor.execute(sql, (t, symbol))
+                # sql = "SELECT * FROM glassnode WHERE t_symbol=%s "
+                # cursor.execute(sql, t_symbol)
+                sql = "SELECT * FROM glassnode WHERE symbol=%s "
+                cursor.execute(sql, symbol)
                 result = cursor.fetchall()
                 return result
 
