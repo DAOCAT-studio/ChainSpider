@@ -252,7 +252,7 @@ def db_trace(api_url, symbol, api_key, status):
         print(e)
 
 
-def db_get_429(symbol):
+def db_get_429():
     # logger = get_logger("glassnode.log")
     try:
         host = settings.HOST
@@ -267,9 +267,9 @@ def db_get_429(symbol):
             # 检查列是否存在
             # 更新追踪表
             with conn.cursor() as cursor:
-                sql = "SELECT api FROM state_trace where last_status=429 and state=1 and symbol=%s "
+                sql = "SELECT api,symbol FROM state_trace where last_status=429 and state=1 "
                 # print(update_query)
-                cursor.execute(sql, symbol)
+                cursor.execute(sql)
                 re_cur = cursor.fetchall()
                 return re_cur
 
@@ -281,4 +281,10 @@ if __name__ == '__main__':
     api = "https://api.glassnode.com/v1/metrics/addresses/sending_count"
     result = [{"t": 161455611800, "s": {"h": 22001246972.515, "w": 22001246, "t": 2200}},
               {"t": 161451111111, "s": {"h": 22001246972.515, "w": 22001246, "t": 2200}}]
-    db_handle(api, 'BTC', result)
+    # db_handle(api, 'BTC', result)
+    r = db_get_429()
+    print(r)
+    print(type(r))
+    print(len(r))
+    d = [{"api":i[0],"symbol":i[1]} for i in r]
+    print(d)

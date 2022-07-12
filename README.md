@@ -19,12 +19,18 @@
 `3.`glassnode表中的数据以**t+symbol**（如：1615075200_BTC）为唯一索引来插入或更新数据；
   
 ## 使用步骤
-（省略建表及拉取docker镜像步骤）
+（省略建表及拉取docker镜像步骤）  
+`1.`使用docker
 ```
 git clone https://github.com/DAOCAT-studio/ChianSpider.git  
 cd ./ChianSpider
 docker build -t chain .  
 docker run chain
+```
+`2.`conda
+```
+conda activate py38
+python fetcher/glassnode.py 
 ```
 
 ## 后续完善
