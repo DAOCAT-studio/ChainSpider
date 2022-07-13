@@ -3,13 +3,14 @@
 ## 项目概述
 本项目用以获取指定数据源提供的api返回数据。  
 目前的数据源有：  
-- [glassnode](https://docs.glassnode.com/api/addresses)
+- [glassnode](https://docs.glassnode.com/)
 
 ## 运行环境
 - python 3.8  
 - docker
 - ubuntu
 - mysql 3.5.18
+- anaconda
 
 ## 数据结构说明
 `1.` 数据库api_data,内含数据表glassnode、追踪表state_trace；  
@@ -20,16 +21,20 @@
   
 ## 使用步骤
 （省略建表及拉取docker镜像步骤）  
-`1.`使用docker
 ```
 git clone https://github.com/DAOCAT-studio/ChianSpider.git  
 cd ./ChianSpider
+```
+`1.`使用docker
+```
 docker build -t chain .  
 docker run chain
 ```
-`2.`conda
+`2.`使用conda
 ```
+conda create -n py38 python=3.8
 conda activate py38
+pip install -r requirements.txt
 python fetcher/glassnode.py 
 ```
 
