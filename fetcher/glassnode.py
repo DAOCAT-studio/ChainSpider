@@ -2,7 +2,6 @@ import json
 import random
 import threading
 import time
-import traceback
 
 import requests
 
@@ -12,15 +11,8 @@ from util import get_logger, db_handle, db_ori_set, db_trace, db_get_429
 API_KEY_LIST = settings.API_KEY_LIST
 
 
-# symbol = settings.SYMBOL
-# params = settings.PARAMS
-
-
 class Spider(object):
     def __init__(self):
-        # self.group_url = []
-        # self.api_url = []
-
         self.params = {
             # 'a': self.symbol,
             'i': '24h',
@@ -32,10 +24,9 @@ class Spider(object):
         try:
             url = "https://api.glassnode.com/v2/metrics/endpoints"
             params = {
-                'api_key': "2BPofIMYS789jEMXbi8dcEiF4Xj"
+                'api_key': random.choice(API_KEY_LIST)
             }
             res = requests.get(url, params=params)
-            # print(res)
             result_list = json.loads(res.text)
             for item in result_list:
                 tier = item.get("tier")
@@ -46,12 +37,11 @@ class Spider(object):
                         symbol = asset.get("symbol")
                         api_dict = {"api": api, "symbol": symbol}
                         self.api_list.append(api_dict)
-            # pp(self.api_list)
 
-        except:
-            print(traceback.format_exc())
+        except Exception as e:
+            logger.error(e)
 
-    # 不同的key开不同的线程
+    # 一个api_key开一个线程
     def get_data(self, api_list, api_key):
         for info in api_list:
             try:
@@ -85,7 +75,6 @@ class Spider(object):
             # print(api_url_list)
             self.handle_api(api_list)
             res = db_get_429()
-        # logger.info("done!bye!")
 
     def handle_api(self, api_list):
         threads = []
@@ -119,14 +108,8 @@ class Spider(object):
         logger.info(
             "共需请求{}次api".format(len(self.api_list)))
         time.sleep(1)
-        # # 数据获取主函数
-        # print('获取数据中...')
-        # for symbol in settings.SYMBOL_LIST:
-        #     # Spider(symbol).run_main()
-        #     self.handle_api(self.api_url, symbol)
-        #     # 补充请求返回429状态的api
-        #     self.check_429(symbol)
-
+        # 数据获取主函数
+        print('获取数据中...')
         self.handle_api(self.api_list)
         self.check_429()
 
