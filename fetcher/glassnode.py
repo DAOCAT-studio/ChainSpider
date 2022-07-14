@@ -6,7 +6,7 @@ import time
 import requests
 
 import settings
-from util import get_logger, db_handle, db_ori_set, db_trace, db_get_429
+from util import get_logger, db_handle, db_ori_set, db_trace, db_get_429, record_api
 
 API_KEY_LIST = settings.API_KEY_LIST
 
@@ -14,7 +14,6 @@ API_KEY_LIST = settings.API_KEY_LIST
 class Spider(object):
     def __init__(self):
         self.params = {
-            # 'a': self.symbol,
             'i': '24h',
             'api_key': random.choice(API_KEY_LIST)
         }
@@ -28,6 +27,10 @@ class Spider(object):
             }
             res = requests.get(url, params=params)
             result_list = json.loads(res.text)
+
+            # 将获取到的api信息入库记录
+            record_api(result_list)
+
             for item in result_list:
                 tier = item.get("tier")
                 if tier != 3:

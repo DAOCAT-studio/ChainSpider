@@ -11,6 +11,11 @@ import requests
 import settings
 
 LOG_ROOT = settings.LOG_ROOT
+host = settings.HOST
+port = settings.PORT
+user = settings.USER
+passwd = settings.PASSWD
+db = settings.DB
 
 
 def get_logger(log_filename, level=logging.DEBUG, when='midnight', back_count=0):
@@ -70,11 +75,6 @@ def get_ip():
 
 def db_ori_set():
     try:
-        host = settings.HOST
-        port = settings.PORT
-        user = settings.USER
-        passwd = settings.PASSWD
-        db = settings.DB
         conn = pymysql.connect(host=host, user=user, password=passwd, database=db, port=port,
                                autocommit=True)
         date = time.strftime("%Y%m%d", time.localtime())
@@ -91,12 +91,6 @@ def db_ori_set():
 def db_handle(api_url, symbol, result_list):
     # logger = get_logger("glassnode.log")
     try:
-        host = settings.HOST
-        port = settings.PORT
-        user = settings.USER
-        passwd = settings.PASSWD
-        db = settings.DB
-
         # col_type = 'varchar(100)'
         col_type = 'double'
         col_name = api_url.split('/')[-2] + '_' + api_url.split('/')[-1]
@@ -162,47 +156,10 @@ def db_handle(api_url, symbol, result_list):
             # 插入api返回的数据
             with conn.cursor() as cursor:
                 try:
-                    # 1
-                    # 先检查相同的t和symbol是否存在，存在即更新，不存在即插入
-                    # select_query = "SELECT 1 FROM glassnode WHERE t=%s AND symbol=%s "
-                    # insert_query = "INSERT INTO glassnode ( t, " + col_name + ", symbol ) VALUES ( %s, %s, %s ) "
-                    # insert_query = "INSERT INTO glassnode ( t, " + col_name + ", symbol ) SELECT %s,%s,%s " \
-                    #                "WHERE NOT EXISTS (SELECT 1 FROM glassnode WHERE t=%s AND symbol=%s)"
-                    # # print(insert_query)
-                    # # print(insert_data)
-                    # # print(len(insert_data))
-                    # cursor.executemany(insert_query, insert_data)
-
-                    # 2
-                    # for tup in insert_data:
-                    #     # print(tup)
-                    #     t = tup[0]
-                    #     data = tup[1]
-                    #     symbol = tup[2]
-                    #
-                    #     check_sql = "SELECT 1 FROM glassnode WHERE t=%s AND symbol=%s "
-                    #     cursor.execute(check_sql, (t, symbol))
-                    #     if cursor.fetchall():
-                    #         update_sql = "UPDATE `glassnode` SET `" + col_name + "` = %s "
-                    #         # print(update_sql)
-                    #         cursor.execute(update_sql, (data))
-                    #     else:
-                    #         # insert_sql = "INSERT INTO glassnode ( t, " + col_name + ", symbol ) SELECT %s,%s,%s " \
-                    #         #                                                         "WHERE NOT EXISTS (SELECT 1 FROM glassnode WHERE t=%s AND symbol=%s)"
-                    #         insert_sql = "INSERT INTO glassnode ( t, " + col_name + ", symbol ) VALUES ( %s, %s, %s ) "
-                    #         cursor.execute(insert_sql, tup)
-
-                    # 3
-                    # sql = "INSERT INTO `glassnode` ( `t_symbol`, `t`, `" + col_name + "`, `symbol` ) VALUES ( %s, %s, %s, %s ) ON DUPLICATE KEY UPDATE `" + col_name + "`=%s "
-                    # print(sql)
-                    # print(insert_data)
-                    # cursor.executemany(sql, insert_data)
-
-                    # 4
                     for data in insert_data:
                         sql = "INSERT INTO glassnode ( t_symbol, t, " + col_name + ", symbol ) VALUES ( %s, %s, %s, %s ) ON DUPLICATE KEY UPDATE " + col_name + " = %s "
                         # print(sql)
-                        cursor.execute(sql,(data[0],data[1],data[2],data[3],data[4]))
+                        cursor.execute(sql, (data[0], data[1], data[2], data[3], data[4]))
 
                     print('successfully inserted data!')
                 except:
@@ -213,21 +170,14 @@ def db_handle(api_url, symbol, result_list):
 
 
     except Exception as e:
-        # print(result_list)
-        # print(insert_data)
-        print(traceback.format_exc())
+        # print(traceback.format_exc())
         # logger.error(e)
+        print(e)
 
 
 def db_trace(api_url, symbol, api_key, status):
     # logger = get_logger("glassnode.log")
     try:
-        host = settings.HOST
-        port = settings.PORT
-        user = settings.USER
-        passwd = settings.PASSWD
-        db = settings.DB
-
         conn = pymysql.connect(host=host, user=user, password=passwd, database=db, port=port,
                                autocommit=True)
         date = time.strftime("%Y%m%d", time.localtime())
@@ -255,17 +205,9 @@ def db_trace(api_url, symbol, api_key, status):
 def db_get_429():
     # logger = get_logger("glassnode.log")
     try:
-        host = settings.HOST
-        port = settings.PORT
-        user = settings.USER
-        passwd = settings.PASSWD
-        db = settings.DB
-
         conn = pymysql.connect(host=host, user=user, password=passwd, database=db, port=port,
                                autocommit=True)
         with conn:
-            # 检查列是否存在
-            # 更新追踪表
             with conn.cursor() as cursor:
                 sql = "SELECT api,symbol FROM state_trace where last_status=429 and state=1 "
                 # print(update_query)
@@ -277,6 +219,33 @@ def db_get_429():
         print(e)
 
 
+def record_api(res):
+    try:
+        insert_api_data = []
+        for item in res:
+            path = "https://api.glassnode.com{}".format(item.get("path"))
+            tier = item.get("tier")
+            assets = str(item.get("assets"))
+            currencies = str(item.get("currencies"))
+            resolutions = str(item.get("resolutions"))
+            formats = str(item.get("formats"))
+            insert_api_data.append((path, tier, assets, currencies, resolutions, formats,
+                                    time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
+
+        conn = pymysql.connect(host=host, user=user, password=passwd, database=db, port=port,
+                               autocommit=True)
+        with conn:
+            with conn.cursor() as cursor:
+                update_query = "REPLACE INTO `endpoints` ( `api_url`,`tier`, `assets`, `currencies`,`resolutions`, `formats`, `updatetime` ) " \
+                               "VALUES ( %s, %s, %s, %s, %s, %s, %s) "
+                # print(update_query)
+                cursor.executemany(update_query, insert_api_data)
+                print("successfully updated endpoints!")
+    except Exception as e:
+        print(e)
+        # print(traceback.format_exc())
+
+
 if __name__ == '__main__':
     api = "https://api.glassnode.com/v1/metrics/addresses/sending_count"
     result = [{"t": 161455611800, "s": {"h": 22001246972.515, "w": 22001246, "t": 2200}},
@@ -286,5 +255,5 @@ if __name__ == '__main__':
     print(r)
     print(type(r))
     print(len(r))
-    d = [{"api":i[0],"symbol":i[1]} for i in r]
+    d = [{"api": i[0], "symbol": i[1]} for i in r]
     print(d)

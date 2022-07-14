@@ -1,3 +1,2 @@
-lxml==4.9.1
 PyMySQL==1.0.2
 requests==2.28.1
