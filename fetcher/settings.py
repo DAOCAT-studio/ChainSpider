@@ -7,20 +7,18 @@ API_KEY_LIST = ['2BPofIMYS789jEMXbi8dcEiF4Xj', '2BF0rMZPoEZzyDP0v913XREBCsO', '2
 cf = configparser.ConfigParser()
 cf.read("config.ini", encoding='UTF-8')
 
-
 if sys.platform == 'win32':
     # local
-    HOST = '127.0.0.1'
-    PORT = 3306
-    USER = cf.get("local", "USER")
-    PASSWD = cf.get("local", "PASSWD")
+    db_set = cf["local"]
+
 else:
     # server
-    HOST = '43.158.211.160'
-    PORT = 3306
-    USER = cf.get("server", "USER")
-    PASSWD = cf.get("server", "PASSWD")
+    db_set = cf["server"]
 
+HOST = db_set["HOST"]
+PORT = db_set["PORT"]
+USER = db_set["USER"]
+PASSWD = db_set["PASSWD"]
 DB = "api_data"
 
 # LOG_ROOT = "F:/"
