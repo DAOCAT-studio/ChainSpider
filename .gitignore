@@ -1,2 +1,8 @@
-/fetcher/logs/
 /fetcher/test.py
+/fetcher/__pycache__/
+
+.idea/
+
+*.log
+*.pyc
+*.json
