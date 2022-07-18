@@ -35,8 +35,8 @@ PASSWD = xxx
 ## 使用步骤
 （省略建表及拉取docker镜像步骤）  
 ```shell
-git clone https://github.com/DAOCAT-studio/ChianSpider.git  
-cd ./ChianSpider
+git clone https://github.com/DAOCAT-studio/ChainSpider.git  
+cd ./ChainSpider
 ```
 `1.`使用docker
 ```shell
