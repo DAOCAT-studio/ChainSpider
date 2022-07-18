@@ -7,13 +7,13 @@ API_KEY_LIST = ['2BPofIMYS789jEMXbi8dcEiF4Xj', '2BF0rMZPoEZzyDP0v913XREBCsO', '2
 if sys.platform == 'win32':
     # local
     cf = configparser.ConfigParser()
-    cf.read('config.ini')
+    cf.read('config.ini',encoding='utf-8')
     db_set = cf['local']
 
 else:
     # server
     cf = configparser.ConfigParser()
-    cf.read('config.ini')
+    cf.read('config.ini',encoding='utf-8')
     db_set = cf['server']
 
 HOST = db_set['HOST']
