@@ -32,8 +32,8 @@ docker run chain
 ```
 `2.`使用conda
 ```
-conda create -n py38 python=3.8
-conda activate py38
+conda create -n chain python=3.8
+conda activate chain
 pip install -r requirements.txt
 python fetcher/glassnode.py 
 ```
