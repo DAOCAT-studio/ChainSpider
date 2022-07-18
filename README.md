@@ -18,7 +18,21 @@
 以24h为时间单位获取数据并入mysql数据库，每个api的返回数据在glassnode中以**api+返回数据字段名**的形式表示，  
 例如，**https://api.glassnode.com/v1/metrics/addresses/sending_to_exchanges_count** 的返回数据在mysql内的字段是**addresses_sending_to_exchanges_count_v**；  
 `3.`glassnode表中的数据以**t+symbol**（如：1615075200_BTC）为唯一索引来插入或更新数据；
-  
+
+## 准备工作
+- 创建mysql数据库及对应表
+- 添加fetcher文件夹下配置文件config.ini，格式如：
+```
+[server]
+HOST = xxx.xxx.xxx.xxx
+PORT = xxxx
+USER = xxx
+PASSWD = xxx
+
+[local]
+...
+```
+
 ## 使用步骤
 （省略建表及拉取docker镜像步骤）  
 ```
