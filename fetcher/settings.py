@@ -13,6 +13,7 @@ if sys.platform == 'win32':
 else:
     # server
     cf = configparser.ConfigParser()
+    print(cf)
     cf.read('config.ini',encoding='utf-8')
     db_set = cf['server']
 
