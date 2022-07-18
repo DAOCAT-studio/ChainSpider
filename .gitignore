@@ -1,5 +1,6 @@
 /fetcher/test.py
 /fetcher/__pycache__/
+/fetcher/config.ini/
 
 .idea/
 

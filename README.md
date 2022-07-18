@@ -40,3 +40,4 @@ python fetcher/glassnode.py
 
 ## 后续完善
 - 优化脚本逻辑，提高效率；
+- 添加更多数据；
