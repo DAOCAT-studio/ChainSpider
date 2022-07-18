@@ -5,10 +5,10 @@ import sys
 API_KEY_LIST = ['2BPofIMYS789jEMXbi8dcEiF4Xj', '2BF0rMZPoEZzyDP0v913XREBCsO', '2BY58n2bpVtRxoAGgph2UThtyQa',
                 '2BmTVlIqRKYCPrKVdznuO5oFdHq', '2BmTvkJL6zDjTQZpS4xonOKqmVE', '2BmUM2A7xjKlLCqhh8f8HUgDLwC']
 
-curpath = os.path.dirname(os.path.realpath(__file__))
-path = os.path.join(curpath, 'config.ini')
+cur_path = os.path.dirname(os.path.realpath(__file__))
+config_path = os.path.join(cur_path, 'config.ini')
 cf = configparser.ConfigParser()
-cf.read(path, encoding='utf-8')
+cf.read(config_path, encoding='utf-8')
 
 if sys.platform == 'win32':
     # local
