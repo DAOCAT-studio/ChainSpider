@@ -5,7 +5,7 @@ API_KEY_LIST = ['2BPofIMYS789jEMXbi8dcEiF4Xj', '2BF0rMZPoEZzyDP0v913XREBCsO', '2
                 '2BmTVlIqRKYCPrKVdznuO5oFdHq', '2BmTvkJL6zDjTQZpS4xonOKqmVE', '2BmUM2A7xjKlLCqhh8f8HUgDLwC']
 
 cf = configparser.ConfigParser()
-cf.read("config.ini")
+cf.read(r"./config.ini")
 
 if sys.platform == 'win32':
     # local
