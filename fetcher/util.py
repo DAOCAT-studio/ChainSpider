@@ -61,14 +61,19 @@ def get_logger(log_filename, level=logging.DEBUG, when='midnight', back_count=0)
 
 
 # 获取代理ip
-def get_ip():
+def get_proxy():
     while True:
         try:
-            response = requests.get(
-                url='http://proxy.httpdaili.com/apinew.asp?text=true&noinfo=true&sl=1&ddbh=nmdd001&px=sj')
+            # response = requests.get(
+            #     url='http://proxy.httpdaili.com/apinew.asp?text=true&noinfo=true&sl=1&ddbh=nmdd001&px=sj')
+            response = requests.get(url='http://127.0.0.1:5000/get/')
             response.encoding = 'utf-8'
-            proxy_ip = response.text.strip()
-            return "socks5://{}".format(proxy_ip)
+            # proxy_ip = response.text.strip()
+            proxy_ip = json.loads(response.text).get("proxy")
+            proxies = {
+                "http": f"http://{proxy_ip}"
+            }
+            return proxies
         except:
             time.sleep(0.05)
 
@@ -244,6 +249,18 @@ def record_api(res):
     except Exception as e:
         print(e)
         # print(traceback.format_exc())
+
+
+def refresh_date():
+    try:
+        conn = pymysql.connect(host=host, user=user, password=passwd, database=db, port=port,
+                               autocommit=True)
+        with conn:
+            with conn.cursor() as cursor:
+                sql = "UPDATE glassnode SET date=FROM_UNIXTIME(t,'%Y%m%d') WHERE date IS NULL "
+                cursor.execute(sql)
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':

@@ -6,7 +6,7 @@ import time
 import requests
 
 import settings
-from util import get_logger, db_handle, db_ori_set, db_trace, db_get_429, record_api
+from util import get_logger, db_handle, db_ori_set, db_trace, db_get_429, record_api, refresh_date
 
 API_KEY_LIST = settings.API_KEY_LIST
 
@@ -115,6 +115,7 @@ class Spider(object):
         print('获取数据中...')
         self.handle_api(self.api_list)
         self.check_429()
+        refresh_date()
 
 
 if __name__ == '__main__':
