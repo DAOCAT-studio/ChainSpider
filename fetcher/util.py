@@ -259,6 +259,7 @@ def refresh_date():
             with conn.cursor() as cursor:
                 sql = "UPDATE glassnode SET date=FROM_UNIXTIME(t,'%Y%m%d') WHERE date IS NULL "
                 cursor.execute(sql)
+                print("successfully refreshed date!")
     except Exception as e:
         print(e)
 

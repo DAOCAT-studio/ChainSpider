@@ -63,8 +63,8 @@ def reduce_data():
 if __name__ == '__main__':
     # 传入日期参数，数据将以元组的列表形式返回
     # 1
-    print(se_data('20220701'))
+    print(se_data('20220722'))
     # 2
-    print(time_series('20210701', '20210801'))
+    # print(time_series('20210701', '20210801'))
     # 3
-    print(reduce_data())
+    # print(reduce_data())
