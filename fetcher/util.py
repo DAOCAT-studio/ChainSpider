@@ -7,6 +7,7 @@ from logging import handlers
 
 import pymysql
 import requests
+from fake_useragent import UserAgent
 
 import settings
 
@@ -64,8 +65,6 @@ def get_logger(log_filename, level=logging.DEBUG, when='midnight', back_count=0)
 def get_proxy():
     while True:
         try:
-            # response = requests.get(
-            #     url='http://proxy.httpdaili.com/apinew.asp?text=true&noinfo=true&sl=1&ddbh=nmdd001&px=sj')
             response = requests.get(url='http://127.0.0.1:5000/get/')
             response.encoding = 'utf-8'
             # proxy_ip = response.text.strip()
@@ -262,6 +261,26 @@ def refresh_date():
                 print("successfully refreshed date!")
     except Exception as e:
         print(e)
+
+
+def parse_json_resp(url, params):
+    while True:
+        try:
+            proxies = get_proxy()
+            # print("using proxy:", proxies)
+            headers = {
+                "User-Agent": str(UserAgent().random)
+            }
+            res = requests.get(url=url, params=params, headers=headers, proxies=proxies,
+                               timeout=2)
+            result_dict = json.loads(res.text)
+            return result_dict
+        except requests.exceptions.ProxyError:
+            continue
+        except requests.exceptions.ReadTimeout:
+            continue
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':

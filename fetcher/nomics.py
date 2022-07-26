@@ -2,9 +2,8 @@ import json
 from pprint import pprint as pp
 
 import requests
-from fake_useragent import UserAgent
 
-from util import get_proxy
+from util import parse_json_resp
 
 
 class Spider(object):
@@ -65,53 +64,26 @@ class Spider(object):
             'limit': 100,  # 只能为100
             'start': 0,
         }
-        while True:
-            try:
-                proxies = get_proxy()
-                # print("using proxy:", proxies)
-                self.headers["User-Agent"] = str(UserAgent().random)
-                res = requests.get(url=self.ticker_url, params=ticker_all_params, headers=self.headers, proxies=proxies,
-                                   timeout=3)
-                res_temp = json.loads(res.text)
-                items_total = res_temp.get("items_total")
-                print(f"应有{items_total}个dead coin需收集")
-                self.dead_coin_list.extend(res_temp.get("items"))
-                t = 0
-                while t <= items_total:
-                    t += 100
-                    print("\r完成进度{0}%".format(t * 100 / items_total), end="", flush=True)
-                    # print(f"本次循环t的值为：{t}")
-                    ticker_all_params["start"] = t
-                    self.headers["User-Agent"] = str(UserAgent().random)
-                    while True:
-                        try:
-                            proxies = get_proxy()
-                            res = requests.get(url=self.ticker_url, params=ticker_all_params, headers=self.headers,
-                                               proxies=proxies, timeout=2)
-                            result = json.loads(res.text)
-                            # print(result)
-                            self.dead_coin_list.extend(result.get("items"))
-                            break
-                        except requests.exceptions.ProxyError:
-                            continue
-                        except requests.exceptions.ReadTimeout:
-                            continue
-                        except Exception as e:
-                            print(e)
-                    # 如使用代理则不需延时
-                    # time.sleep(random.uniform(1, 3))
-                print("-------------------all done!-------------------")
-                print(self.dead_coin_list)
-                # with open('deadcoin.json', 'w', encoding='utf-8') as f:
-                #     f.write(str(self.dead_coin_list))
-                print(f"共计获取{len(self.dead_coin_list)}个dead coin")
-                break
-            except requests.exceptions.ProxyError:
-                continue
-            except requests.exceptions.ReadTimeout:
-                continue
-            except Exception as e:
-                print(e)
+        res_temp = parse_json_resp(url=self.ticker_url, params=ticker_all_params)
+        items_total = res_temp.get("items_total")
+        print(f"应有{items_total}个dead coin需收集")
+        self.dead_coin_list.extend(res_temp.get("items"))
+        t = 0
+
+        while t <= items_total:
+            t += 100
+            print("\r完成进度{0}%".format(t * 100 / items_total), end="", flush=True)
+            # print(f"本次循环t的值为：{t}")
+            ticker_all_params["start"] = t
+            result = parse_json_resp(url=self.ticker_url, params=ticker_all_params)
+            self.dead_coin_list.extend(result.get("items"))
+            # 如使用代理则不需延时
+            # time.sleep(random.uniform(1, 3))
+        print("-------------------all done!-------------------")
+        print(self.dead_coin_list)
+        # with open('deadcoin.json', 'w', encoding='utf-8') as f:
+        #     f.write(str(self.dead_coin_list))
+        print(f"共计获取{len(self.dead_coin_list)}个dead coin")
 
     def parse_dead_coin(self):
         ticker_detail_params = {
@@ -120,22 +92,8 @@ class Spider(object):
             'quote-currency': 'USD',
             'symbols': 'VEN'
         }
-        while True:
-            try:
-                proxies = get_proxy()
-                # print("using proxy:", proxies)
-                self.headers["User-Agent"] = str(UserAgent().random)
-                res = requests.get(url=self.ticker_url, params=ticker_detail_params, headers=self.headers, proxies=proxies,
-                                   timeout=3)
-                res_temp = json.loads(res.text)
-                print(res_temp)
-                break
-            except requests.exceptions.ProxyError:
-                continue
-            except requests.exceptions.ReadTimeout:
-                continue
-            except Exception as e:
-                print(e)
+        res_temp = parse_json_resp(url=self.ticker_url, params=ticker_detail_params)
+        print(res_temp)
 
     def parse_dead_coin_v2(self):
         candles_params = {
@@ -146,22 +104,8 @@ class Spider(object):
             'resolution': '1D',
             'to': '2018-08-28T00:00:01.000Z'
         }
-        while True:
-            try:
-                proxies = get_proxy()
-                # print("using proxy:", proxies)
-                self.headers["User-Agent"] = str(UserAgent().random)
-                res = requests.get(url=self.candles_url, params=candles_params, headers=self.headers, proxies=proxies,
-                                   timeout=3)
-                res_temp = json.loads(res.text)
-                print(res_temp)
-                break
-            except requests.exceptions.ProxyError:
-                continue
-            except requests.exceptions.ReadTimeout:
-                continue
-            except Exception as e:
-                print(e)
+        res_temp = parse_json_resp(url=self.candles_url, params=candles_params)
+        print(res_temp)
 
 
 if __name__ == '__main__':
