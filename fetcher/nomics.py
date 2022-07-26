@@ -3,7 +3,7 @@ from pprint import pprint as pp
 
 import requests
 
-from util import parse_json_resp
+from util import parse_json_resp, insert_dead_coin
 
 
 class Spider(object):
@@ -71,19 +71,42 @@ class Spider(object):
         t = 0
 
         while t <= items_total:
-            t += 100
             print("\r完成进度{0}%".format(t * 100 / items_total), end="", flush=True)
-            # print(f"本次循环t的值为：{t}")
+            t += 100
             ticker_all_params["start"] = t
             result = parse_json_resp(url=self.ticker_url, params=ticker_all_params)
             self.dead_coin_list.extend(result.get("items"))
-            # 如使用代理则不需延时
-            # time.sleep(random.uniform(1, 3))
-        print("-------------------all done!-------------------")
-        print(self.dead_coin_list)
-        # with open('deadcoin.json', 'w', encoding='utf-8') as f:
-        #     f.write(str(self.dead_coin_list))
-        print(f"共计获取{len(self.dead_coin_list)}个dead coin")
+
+        print(f"there are total {len(self.dead_coin_list)} dead coins, inserting into database...")
+
+        data_list = []
+        # 处理获取的字典列表
+        for item in self.dead_coin_list:
+            symbol = item.get("symbol")
+            name = item.get("name")
+            status = item.get("status")
+            platform_currency = item.get("platform_currency")
+            price = item.get("price")
+            price_date = item.get("price_date")
+            price_timestamp = item.get("price_timestamp")
+            circulating_supply = item.get("circulating_supply")
+            max_supply = item.get("max_supply")
+            market_cap = item.get("market_cap")
+            num_exchanges = item.get("num_exchanges")
+            num_pairs = item.get("num_pairs")
+            num_pairs_unmapped = item.get("num_pairs_unmapped")
+            first_candle = item.get("first_candle")
+            first_trade = item.get("first_trade")
+            first_order_book = item.get("first_order_book")
+            high = item.get("high")
+            high_timestamp = item.get("high_timestamp")
+            tup = (symbol, name, status, platform_currency, price, price_date, price_timestamp,
+                   circulating_supply, max_supply, market_cap, num_exchanges, num_pairs, num_pairs_unmapped,
+                   first_candle, first_trade, first_order_book, high, high_timestamp)
+            # print(len(tup))
+            data_list.append(tup)
+
+        insert_dead_coin(data_list)
 
     def parse_dead_coin(self):
         ticker_detail_params = {

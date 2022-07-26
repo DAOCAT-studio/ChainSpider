@@ -283,6 +283,23 @@ def parse_json_resp(url, params):
             print(e)
 
 
+def insert_dead_coin(data_list):
+    # logger = get_logger("glassnode.log")
+    try:
+        conn = pymysql.connect(host=host, user=user, password=passwd, database=db, port=port,
+                               autocommit=True)
+        with conn:
+            with conn.cursor() as cursor:
+                sql = "INSERT INTO dead_coin ( symbol, name, status, platform_currency, price, price_date, price_timestamp," \
+                      "circulating_supply, max_supply, market_cap, num_exchanges, num_pairs, num_pairs_unmapped, first_candle, " \
+                      "first_trade, first_order_book, high, high_timestamp ) " \
+                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
+                cursor.executemany(sql, data_list)
+                print("successfully inserted into dead_coin!")
+    except Exception as e:
+        print(e)
+
+
 if __name__ == '__main__':
     api = "https://api.glassnode.com/v1/metrics/addresses/sending_count"
     result = [{"t": 161455611800, "s": {"h": 22001246972.515, "w": 22001246, "t": 2200}},
