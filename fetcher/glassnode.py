@@ -11,13 +11,15 @@ from util import get_logger, db_handle, db_ori_set, db_trace, db_get_429, record
 API_KEY_LIST = settings.API_KEY_LIST
 
 
-class Spider(object):
+class GNSpider(object):
     def __init__(self):
         self.params = {
             'i': '24h',
             'api_key': random.choice(API_KEY_LIST)
         }
         self.api_list = []
+
+        self.logger = get_logger("glassnode.log")
 
     def get_api_url(self):
         try:
@@ -42,7 +44,7 @@ class Spider(object):
                         self.api_list.append(api_dict)
 
         except Exception as e:
-            logger.error(e)
+            self.logger.error(e)
 
     # 一个api_key开一个线程
     def get_data(self, api_list, api_key):
@@ -66,7 +68,7 @@ class Spider(object):
 
                 time.sleep(random.uniform(0.1, 1))
             except Exception as e:
-                logger.error("api info:{};e:{}".format(json.dumps(info), e))
+                self.logger.error("api info:{};e:{}".format(json.dumps(info), e))
 
     # 重新获取返回429的api
     def check_429(self):
@@ -103,12 +105,13 @@ class Spider(object):
             j.join()
 
     def run_main(self):
+
         print('初始化追踪表状态...')
         db_ori_set()
 
         print('获取所有api中...')
         self.get_api_url()
-        logger.info(
+        self.logger.info(
             "共需请求{}次api".format(len(self.api_list)))
         time.sleep(1)
         # 数据获取主函数
@@ -119,5 +122,4 @@ class Spider(object):
 
 
 if __name__ == '__main__':
-    logger = get_logger("glassnode.log")
-    Spider().run_main()
+    GNSpider().run_main()

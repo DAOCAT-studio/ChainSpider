@@ -292,12 +292,20 @@ def insert_dead_coin(data_list):
             with conn.cursor() as cursor:
                 sql = "INSERT INTO dead_coin ( symbol, name, status, platform_currency, price, price_date, price_timestamp," \
                       "circulating_supply, max_supply, market_cap, num_exchanges, num_pairs, num_pairs_unmapped, first_candle, " \
-                      "first_trade, first_order_book, high, high_timestamp ) " \
-                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
+                      "first_trade, first_order_book, first_priced_at, high, high_timestamp ) " \
+                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
                 cursor.executemany(sql, data_list)
                 print("successfully inserted into dead_coin!")
     except Exception as e:
         print(e)
+
+import sys
+def process_bar(num, total):
+    rate = float(num)/total
+    ratenum = int(100*rate)
+    r = '\r[{}{}]{}%'.format('*'*ratenum,' '*(100-ratenum), ratenum)
+    sys.stdout.write(r)
+    sys.stdout.flush()
 
 
 if __name__ == '__main__':
@@ -305,9 +313,9 @@ if __name__ == '__main__':
     result = [{"t": 161455611800, "s": {"h": 22001246972.515, "w": 22001246, "t": 2200}},
               {"t": 161451111111, "s": {"h": 22001246972.515, "w": 22001246, "t": 2200}}]
     # db_handle(api, 'BTC', result)
-    r = db_get_429()
-    print(r)
-    print(type(r))
-    print(len(r))
-    d = [{"api": i[0], "symbol": i[1]} for i in r]
-    print(d)
+    # r = db_get_429()
+    # print(r)
+    # print(type(r))
+    # print(len(r))
+    # d = [{"api": i[0], "symbol": i[1]} for i in r]
+    # print(d)

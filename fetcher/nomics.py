@@ -6,7 +6,7 @@ import requests
 from util import parse_json_resp, insert_dead_coin
 
 
-class Spider(object):
+class NMSpider(object):
     def __init__(self):
         self.api_list = []
 
@@ -68,11 +68,11 @@ class Spider(object):
         items_total = res_temp.get("items_total")
         print(f"应有{items_total}个dead coin需收集")
         self.dead_coin_list.extend(res_temp.get("items"))
-        t = 0
+        # t = 0
 
-        while t <= items_total:
+        for t in range(0, items_total + 1, 100):
             print("\r完成进度{0}%".format(t * 100 / items_total), end="", flush=True)
-            t += 100
+            # t += 100
             ticker_all_params["start"] = t
             result = parse_json_resp(url=self.ticker_url, params=ticker_all_params)
             self.dead_coin_list.extend(result.get("items"))
@@ -98,12 +98,13 @@ class Spider(object):
             first_candle = item.get("first_candle")
             first_trade = item.get("first_trade")
             first_order_book = item.get("first_order_book")
+            first_priced_at = item.get("first_priced_at")
             high = item.get("high")
             high_timestamp = item.get("high_timestamp")
             tup = (symbol, name, status, platform_currency, price, price_date, price_timestamp,
                    circulating_supply, max_supply, market_cap, num_exchanges, num_pairs, num_pairs_unmapped,
-                   first_candle, first_trade, first_order_book, high, high_timestamp)
-            # print(len(tup))
+                   first_candle, first_trade, first_order_book, first_priced_at, high, high_timestamp)
+
             data_list.append(tup)
 
         insert_dead_coin(data_list)
@@ -132,6 +133,6 @@ class Spider(object):
 
 
 if __name__ == '__main__':
-    Spider().get_dead_coin()
+    NMSpider().get_dead_coin()
     # Spider().parse_deadcoin()
     # Spider().parse_dead_coin_v2()
