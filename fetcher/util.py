@@ -290,22 +290,30 @@ def insert_dead_coin(data_list):
                                autocommit=True)
         with conn:
             with conn.cursor() as cursor:
-                sql = "INSERT INTO dead_coin ( symbol, name, status, platform_currency, price, price_date, price_timestamp," \
-                      "circulating_supply, max_supply, market_cap, num_exchanges, num_pairs, num_pairs_unmapped, first_candle, " \
-                      "first_trade, first_order_book, first_priced_at, high, high_timestamp ) " \
-                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
+                sql = "INSERT INTO dead_coin ( name_id, currency, symbol, name, status, platform_currency, price, price_date, " \
+                      "price_timestamp, circulating_supply, max_supply, market_cap, num_exchanges, num_pairs, num_pairs_unmapped, " \
+                      "first_candle, first_trade, first_order_book, first_priced_at, high, high_timestamp ) " \
+                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
                 cursor.executemany(sql, data_list)
                 print("successfully inserted into dead_coin!")
     except Exception as e:
         print(e)
 
-import sys
-def process_bar(num, total):
-    rate = float(num)/total
-    ratenum = int(100*rate)
-    r = '\r[{}{}]{}%'.format('*'*ratenum,' '*(100-ratenum), ratenum)
-    sys.stdout.write(r)
-    sys.stdout.flush()
+
+def insert_candles(data_list):
+    # logger = get_logger("glassnode.log")
+    try:
+        conn = pymysql.connect(host=host, user=user, password=passwd, database=db, port=port,
+                               autocommit=True)
+        with conn:
+            with conn.cursor() as cursor:
+                sql = "INSERT INTO candles ( timestamp, open, high, low, close, volume, transparent_open, transparent_high, " \
+                      "transparent_low, transparent_close, transparent_volume, volume_transparency ) " \
+                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
+                cursor.executemany(sql, data_list)
+                print("successfully inserted into candles!")
+    except Exception as e:
+        print(e)
 
 
 if __name__ == '__main__':

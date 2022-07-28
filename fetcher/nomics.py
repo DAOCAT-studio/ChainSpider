@@ -3,7 +3,7 @@ from pprint import pprint as pp
 
 import requests
 
-from util import parse_json_resp, insert_dead_coin
+from util import parse_json_resp, insert_dead_coin, insert_candles
 
 
 class NMSpider(object):
@@ -66,22 +66,25 @@ class NMSpider(object):
         }
         res_temp = parse_json_resp(url=self.ticker_url, params=ticker_all_params)
         items_total = res_temp.get("items_total")
-        print(f"应有{items_total}个dead coin需收集")
+        print(f"there are {items_total} dead coins need to be done!")
         self.dead_coin_list.extend(res_temp.get("items"))
         # t = 0
 
         for t in range(0, items_total + 1, 100):
-            print("\r完成进度{0}%".format(t * 100 / items_total), end="", flush=True)
+            # for t in range(0, 200, 100):
+            print("\rloading...{}%".format(round(t * 100 / items_total, 2)), end="", flush=True)
             # t += 100
             ticker_all_params["start"] = t
             result = parse_json_resp(url=self.ticker_url, params=ticker_all_params)
             self.dead_coin_list.extend(result.get("items"))
 
-        print(f"there are total {len(self.dead_coin_list)} dead coins, inserting into database...")
+        print(f"\nthere are total {len(self.dead_coin_list)} dead coins, inserting into database...")
 
         data_list = []
         # 处理获取的字典列表
         for item in self.dead_coin_list:
+            name_id = item.get("id")
+            currency = item.get("currency")
             symbol = item.get("symbol")
             name = item.get("name")
             status = item.get("status")
@@ -101,15 +104,17 @@ class NMSpider(object):
             first_priced_at = item.get("first_priced_at")
             high = item.get("high")
             high_timestamp = item.get("high_timestamp")
-            tup = (symbol, name, status, platform_currency, price, price_date, price_timestamp,
+            tup = (name_id, currency, symbol, name, status, platform_currency, price, price_date, price_timestamp,
                    circulating_supply, max_supply, market_cap, num_exchanges, num_pairs, num_pairs_unmapped,
                    first_candle, first_trade, first_order_book, first_priced_at, high, high_timestamp)
 
             data_list.append(tup)
 
+        # 数据入库
         insert_dead_coin(data_list)
 
     def parse_dead_coin(self):
+        # 这里的返回应该只是已获得数据的单个数据
         ticker_detail_params = {
             'filter': 'any',
             'interval': '1d',
@@ -119,20 +124,37 @@ class NMSpider(object):
         res_temp = parse_json_resp(url=self.ticker_url, params=ticker_detail_params)
         print(res_temp)
 
-    def parse_dead_coin_v2(self):
-        candles_params = {
-            'bars': 320,
-            'convert': 'USD',
-            'from': '2017-10-12T00:00:00.000Z',
-            'id': 'VEN',
-            'resolution': '1D',
-            'to': '2018-08-28T00:00:01.000Z'
-        }
+    def parse_candles(self):
+        # 重点在于form和to两个时间该使用什么数据
+        candles_params = {'convert': 'USD', 'resolution': '1D'}
+        candles_params.update({"from": "2017-10-04T00:00:00Z",
+                               "to": "2019-10-19T00:00:00Z", "id": "HPC"})  # 这里的id应为dead_coin表中的name_id
         res_temp = parse_json_resp(url=self.candles_url, params=candles_params)
         print(res_temp)
+        print(f"length of response:{len(res_temp)}")
+        insert_data = []
+        for item in res_temp:
+            timestamp = item.get("timestamp")
+            open_ = item.get("open")
+            high = item.get("high")
+            low = item.get("low")
+            close = item.get("close")
+            volume = item.get("volume")
+            transparent_open = item.get("transparent_open")
+            transparent_high = item.get("transparent_high")
+            transparent_low = item.get("transparent_low")
+            transparent_close = item.get("transparent_close")
+            transparent_volume = item.get("transparent_volume")
+            volume_transparency = json.dumps(item.get("volume_transparency"))
+            data = (timestamp, open_, high, low, close, volume, transparent_open, transparent_high, transparent_low,
+                    transparent_close, transparent_volume, volume_transparency)
+            insert_data.append(data)
+
+        # 数据入库
+        insert_candles(insert_data)
 
 
 if __name__ == '__main__':
     NMSpider().get_dead_coin()
-    # Spider().parse_deadcoin()
-    # Spider().parse_dead_coin_v2()
+    # NMSpider().parse_deadcoin()
+    # NMSpider().parse_candles()
