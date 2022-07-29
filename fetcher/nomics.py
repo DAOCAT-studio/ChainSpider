@@ -15,6 +15,7 @@ class NMSpider(object):
 
         self.candles_url = 'https://nomics.com/data/currency-candles'
         self.ticker_url = 'https://nomics.com/data/currencies-ticker'
+        self.historical_url = 'https://nomics.com/data/currency-history'
 
     def get_api(self):
         with open("swagger.json", "r") as json_file:
@@ -67,7 +68,7 @@ class NMSpider(object):
         res_temp = parse_json_resp(url=self.ticker_url, params=ticker_all_params)
         items_total = res_temp.get("items_total")
         print(f"there are {items_total} dead coins need to be done!")
-        self.dead_coin_list.extend(res_temp.get("items"))
+        # self.dead_coin_list.extend(res_temp.get("items"))
         # t = 0
 
         for t in range(0, items_total + 1, 100):
@@ -124,16 +125,30 @@ class NMSpider(object):
         res_temp = parse_json_resp(url=self.ticker_url, params=ticker_detail_params)
         print(res_temp)
 
-    def parse_candles(self):
-        # 重点在于form和to两个时间该使用什么数据
-        candles_params = {'convert': 'USD', 'resolution': '1D'}
-        candles_params.update({"from": "2017-10-04T00:00:00Z",
-                               "to": "2019-10-19T00:00:00Z", "id": "HPC"})  # 这里的id应为dead_coin表中的name_id
-        res_temp = parse_json_resp(url=self.candles_url, params=candles_params)
-        print(res_temp)
-        print(f"length of response:{len(res_temp)}")
-        insert_data = []
-        for item in res_temp:
+    def parse_historical(self):
+        name_id = 'HUSD2'
+        historical_params = {
+            'base': name_id,
+            'convert': 'USD',
+            'limit': 100,
+            'start': 0
+        }
+        res_1st = parse_json_resp(url=self.historical_url, params=historical_params)
+        # print(res_1st)
+        # print(f"length of response:{len(res_1st.get('items'))}")
+        # 获取历史数据总条数
+        items_total = res_1st.get('items_total')
+        if items_total <= 100:
+            historical_data = res_1st.get("items")
+        else:
+            historical_params["limit"] = items_total
+            # 再次请求得到所有数据
+            res_2nd = parse_json_resp(url=self.historical_url, params=historical_params)
+            historical_data = res_2nd.get("items")
+        print(f"length of request response:{len(historical_data)}")
+        insert_historical_data = []
+        # 解析为入库数据
+        for item in historical_data:
             timestamp = item.get("timestamp")
             open_ = item.get("open")
             high = item.get("high")
@@ -146,15 +161,18 @@ class NMSpider(object):
             transparent_close = item.get("transparent_close")
             transparent_volume = item.get("transparent_volume")
             volume_transparency = json.dumps(item.get("volume_transparency"))
-            data = (timestamp, open_, high, low, close, volume, transparent_open, transparent_high, transparent_low,
-                    transparent_close, transparent_volume, volume_transparency)
-            insert_data.append(data)
+            data = (
+                name_id, timestamp, open_, high, low, close, volume, transparent_open, transparent_high,
+                transparent_low,
+                transparent_close, transparent_volume, volume_transparency)
+            insert_historical_data.append(data)
 
         # 数据入库
-        insert_candles(insert_data)
+        insert_candles(insert_historical_data)
 
 
 if __name__ == '__main__':
-    NMSpider().get_dead_coin()
+    # NMSpider().get_dead_coin()
     # NMSpider().parse_deadcoin()
     # NMSpider().parse_candles()
+    NMSpider().parse_historical()

@@ -307,9 +307,9 @@ def insert_candles(data_list):
                                autocommit=True)
         with conn:
             with conn.cursor() as cursor:
-                sql = "INSERT INTO candles ( timestamp, open, high, low, close, volume, transparent_open, transparent_high, " \
+                sql = "INSERT INTO candles ( name_id, timestamp, open, high, low, close, volume, transparent_open, transparent_high, " \
                       "transparent_low, transparent_close, transparent_volume, volume_transparency ) " \
-                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
+                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
                 cursor.executemany(sql, data_list)
                 print("successfully inserted into candles!")
     except Exception as e:
