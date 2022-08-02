@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import random
 import time
 import traceback
 from logging import handlers
@@ -274,6 +275,7 @@ def parse_json_resp(url, params):
             res = requests.get(url=url, params=params, headers=headers, proxies=proxies,
                                timeout=2)
             result_dict = json.loads(res.text)
+            time.sleep(random.uniform(0.05, 1))
             return result_dict
         except requests.exceptions.ProxyError:
             continue
@@ -281,7 +283,6 @@ def parse_json_resp(url, params):
             continue
         except Exception as e:
             print(e)
-            print(res.status_code)
 
 
 def insert_tickers(data_list):
@@ -332,6 +333,7 @@ def get_coins():
 
     except Exception as e:
         print(e)
+
 
 if __name__ == '__main__':
     api = "https://api.glassnode.com/v1/metrics/addresses/sending_count"

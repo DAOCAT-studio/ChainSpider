@@ -198,7 +198,7 @@ class NMSpider(object):
         # 任务总数
         total = len(name_list)
         # 开5个线程
-        n = 8
+        n = 5
 
         threads = []
         if total % n == 0:
