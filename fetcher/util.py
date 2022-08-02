@@ -269,7 +269,7 @@ def parse_json_resp(url, params):
             proxies = get_proxy()
             # print("using proxy:", proxies)
             headers = {
-                "User-Agent": str(UserAgent().random)
+                "User-Agent": str(UserAgent(verify_ssl=False).random)
             }
             res = requests.get(url=url, params=params, headers=headers, proxies=proxies,
                                timeout=2)
