@@ -268,7 +268,7 @@ def parse_json_resp(url, params):
     while True:
         try:
             proxies = get_proxy()
-            # print("using proxy:", proxies)
+            print("using proxy:", proxies)
             headers = {
                 "User-Agent": str(UserAgent(use_cache_server=False).random)
             }
