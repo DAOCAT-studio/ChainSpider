@@ -217,8 +217,8 @@ class NMSpider(object):
 
 if __name__ == '__main__':
     N = NMSpider()
-    # N.get_tickers(N.labels["active"])
-    # N.get_tickers(N.labels["dead"])
+    N.get_tickers(N.labels["active"])
+    N.get_tickers(N.labels["dead"])
     # NMSpider().parse_single_coin()
     # NMSpider().parse_candles()
     # NMSpider().parse_historical()
