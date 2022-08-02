@@ -281,6 +281,7 @@ def parse_json_resp(url, params):
             continue
         except Exception as e:
             print(e)
+            print(res.status_code)
 
 
 def insert_tickers(data_list):
