@@ -283,19 +283,19 @@ def parse_json_resp(url, params):
             print(e)
 
 
-def insert_dead_coin(data_list):
+def insert_tickers(data_list):
     # logger = get_logger("glassnode.log")
     try:
         conn = pymysql.connect(host=host, user=user, password=passwd, database=db, port=port,
                                autocommit=True)
         with conn:
             with conn.cursor() as cursor:
-                sql = "INSERT INTO dead_coin ( name_id, currency, symbol, name, status, platform_currency, price, price_date, " \
-                      "price_timestamp, circulating_supply, max_supply, market_cap, num_exchanges, num_pairs, num_pairs_unmapped, " \
-                      "first_candle, first_trade, first_order_book, first_priced_at, high, high_timestamp ) " \
-                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
+                sql = "REPLACE INTO `tickers` ( `name_id`, `currency`, `symbol`, `name`, `status`, `platform_currency`, `price`, `price_date`, " \
+                      "`price_timestamp`, `circulating_supply`, `max_supply`, `market_cap`, `market_cap_dominance`, `num_exchanges`, `num_pairs`, `num_pairs_unmapped`, " \
+                      "`first_candle`, `first_trade`, `first_order_book`, `first_priced_at`, `rank`, `rank_delta`, `high`, `high_timestamp`, `d1` ) " \
+                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
                 cursor.executemany(sql, data_list)
-                print("successfully inserted into dead_coin!")
+                print("successfully inserted into tickers!")
     except Exception as e:
         print(e)
 
@@ -315,6 +315,22 @@ def insert_candles(data_list):
     except Exception as e:
         print(e)
 
+
+def get_coins():
+    # logger = get_logger("glassnode.log")
+    try:
+        conn = pymysql.connect(host=host, user=user, password=passwd, database=db, port=port,
+                               autocommit=True)
+        with conn:
+            with conn.cursor() as cursor:
+                sql = "SELECT name_id FROM tickers "
+                # print(update_query)
+                cursor.execute(sql)
+                re_cur = cursor.fetchall()
+                return re_cur
+
+    except Exception as e:
+        print(e)
 
 if __name__ == '__main__':
     api = "https://api.glassnode.com/v1/metrics/addresses/sending_count"

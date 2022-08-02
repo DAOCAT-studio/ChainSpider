@@ -7,4 +7,5 @@ def startGlassnode():
 
 
 def startNomics():
-    NMSpider().get_dead_coin()
+    # NMSpider().get_tickers()
+    pass
