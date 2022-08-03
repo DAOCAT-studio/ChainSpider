@@ -268,7 +268,7 @@ def parse_json_resp(url, params):
     while True:
         try:
             proxies = get_proxy()
-            print("using proxy:", proxies)
+            # print("using proxy:", proxies)
             headers = {
                 "User-Agent": str(UserAgent(use_cache_server=False).random)
             }
@@ -309,9 +309,9 @@ def insert_candles(data_list):
                                autocommit=True)
         with conn:
             with conn.cursor() as cursor:
-                sql = "INSERT INTO candles ( name_id, timestamp, open, high, low, close, volume, transparent_open, transparent_high, " \
+                sql = "REPLACE INTO candles ( name_id, status, name_t, timestamp, open, high, low, close, volume, transparent_open, transparent_high, " \
                       "transparent_low, transparent_close, transparent_volume, volume_transparency ) " \
-                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
+                      "VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) "
                 cursor.executemany(sql, data_list)
                 print("successfully inserted into candles!")
     except Exception as e:
@@ -325,7 +325,7 @@ def get_coins():
                                autocommit=True)
         with conn:
             with conn.cursor() as cursor:
-                sql = "SELECT name_id FROM tickers "
+                sql = "SELECT name_id,status FROM tickers "
                 # print(update_query)
                 cursor.execute(sql)
                 re_cur = cursor.fetchall()
@@ -346,3 +346,4 @@ if __name__ == '__main__':
     # print(len(r))
     # d = [{"api": i[0], "symbol": i[1]} for i in r]
     # print(d)
+    print(get_coins())

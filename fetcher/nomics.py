@@ -146,9 +146,10 @@ class NMSpider(object):
         res_temp = parse_json_resp(url=self.ticker_url, params=ticker_detail_params)
         print(res_temp)
 
-    def parse_historical(self, name_id_list):
-        for name_id in name_id_list:
-            # name_id = 'HUSD2'
+    def parse_historical(self, name_status_list):
+        for name_status in name_status_list:
+            name_id = name_status[0]
+            status = name_status[1]
             historical_params = {
                 'base': name_id,
                 'convert': 'USD',
@@ -183,8 +184,9 @@ class NMSpider(object):
                 transparent_close = item.get("transparent_close")
                 transparent_volume = item.get("transparent_volume")
                 volume_transparency = json.dumps(item.get("volume_transparency"))
+                name_t = f"{name_id}_{timestamp}"
                 data = (
-                    name_id, timestamp, open_, high, low, close, volume, transparent_open, transparent_high,
+                    name_id, status, name_t, timestamp, open_, high, low, close, volume, transparent_open, transparent_high,
                     transparent_low,
                     transparent_close, transparent_volume, volume_transparency)
                 insert_historical_data.append(data)
@@ -193,10 +195,10 @@ class NMSpider(object):
             insert_candles(insert_historical_data)
 
     def handle_historical(self):
-        name_list = [i[0] for i in get_coins()]
+        name_status = get_coins()
         # print(name_list)
         # 任务总数
-        total = len(name_list)
+        total = len(name_status)
         # 开5个线程
         n = 5
 
@@ -207,7 +209,7 @@ class NMSpider(object):
             cnt = total // n + 1
         for i in range(n):
             threads.append(
-                threading.Thread(target=self.parse_historical, args=(name_list[i * cnt:(i + 1) * cnt],)))
+                threading.Thread(target=self.parse_historical, args=(name_status[i * cnt:(i + 1) * cnt],)))
 
         for i in threads:
             i.start()
