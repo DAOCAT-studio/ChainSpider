@@ -168,7 +168,7 @@ class NMSpider(object):
                 # 再次请求得到所有数据
                 res_2nd = parse_json_resp(url=self.historical_url, params=historical_params)
                 historical_data = res_2nd.get("items")
-            print(f"requested {name_id},the total count of response:{len(historical_data)}")
+            print(f"requested {name_id}({status}),the total count of response:{len(historical_data)}")
             insert_historical_data = []
             # 解析为入库数据
             for item in historical_data:
