@@ -8,5 +8,5 @@ ADD . /app
 WORKDIR /app
 #修改为清华源
 RUN pip install -r requirements.txt
-# Run glassnode.py when the container launches
-CMD ["python", "/app/fetcher/glassnode.py"]
+# Run scheduler.py when the container launches
+CMD ["python", "/app/fetcher/scheduler.py"]

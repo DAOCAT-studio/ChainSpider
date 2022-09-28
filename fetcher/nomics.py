@@ -58,7 +58,7 @@ class NMSpider(object):
         with open(f"{file_name}.json", "w") as json_file:
             json_file.write(res.text)
 
-    def get_tickers(self,labels):
+    def get_tickers(self, labels):
         print(f"getting {labels} coins...")
         ticker_detail_params = {
             'filter': 'any',
@@ -186,7 +186,8 @@ class NMSpider(object):
                 volume_transparency = json.dumps(item.get("volume_transparency"))
                 name_t = f"{name_id}_{timestamp}"
                 data = (
-                    name_id, status, name_t, timestamp, open_, high, low, close, volume, transparent_open, transparent_high,
+                    name_id, status, name_t, timestamp, open_, high, low, close, volume, transparent_open,
+                    transparent_high,
                     transparent_low,
                     transparent_close, transparent_volume, volume_transparency)
                 insert_historical_data.append(data)
@@ -219,8 +220,8 @@ class NMSpider(object):
 
 if __name__ == '__main__':
     N = NMSpider()
-    # N.get_tickers(N.labels["active"])
-    # N.get_tickers(N.labels["dead"])
+    N.get_tickers(N.labels["active"])
+    N.get_tickers(N.labels["dead"])
     # NMSpider().parse_single_coin()
     # NMSpider().parse_candles()
     # NMSpider().parse_historical()
