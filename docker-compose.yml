@@ -14,9 +14,7 @@ services:
       # 数据库还原目录 可将需要还原的sql文件放在这里
       - ./apps/mysql/source:/docker-entrypoint-initdb.d
     ports:
-      - "3306:3306" # 与配置文件保持一致
-    expose:
-      - 3306
+      - "3307:3306" # 与配置文件保持一致
     restart: always
  
   spider:
