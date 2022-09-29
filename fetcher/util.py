@@ -66,7 +66,7 @@ def get_logger(log_filename, level=logging.DEBUG, when='midnight', back_count=0)
 def get_proxy():
     while True:
         try:
-            response = requests.get(url='http://127.0.0.1:5010/get/')
+            response = requests.get(url='http://172.22.0.3:5010/get/')
             response.encoding = 'utf-8'
             # proxy_ip = response.text.strip()
             proxy_ip = json.loads(response.text).get("proxy")
